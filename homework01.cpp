@@ -93,33 +93,19 @@ int main(void)
     Game game;
     game.n=0;
 
-    //declare a box shape
+    //declare a box shape	
+		
+		
     
-    	game.box[0].width = 80;
-    	game.box[0].height = 12;
-    	game.box[0].center.x = 100;
-    	game.box[0].center.y = 500;
+    for(int j=0; j<5; j++)
+    {
+		
+		game.box[j].width = 80;
+    	game.box[j].height = 12;
+    	game.box[j].center.x = 100+(j*100);
+    	game.box[j].center.y = 500-(j*50);	
+	}
     
-    	game.box[1].width = 80;
-    	game.box[1].height = 12;
-    	game.box[1].center.x = 200;
-    	game.box[1].center.y = 450;
-
-    	game.box[2].width = 80;
-    	game.box[2].height = 12;
-    	game.box[2].center.x = 300;
-    	game.box[2].center.y = 400;
-    	
-	game.box[3].width = 80;
-    	game.box[3].height = 12;
-    	game.box[3].center.x = 400;
-    	game.box[3].center.y = 350;
-    	
-	game.box[4].width = 80;
-    	game.box[4].height = 12;
-    	game.box[4].center.x = 500;
-    	game.box[4].center.y = 300;
-   
        	//start animation
     while (!done) {
 	while (XPending(dpy)) {
@@ -210,7 +196,7 @@ void check_mouse(XEvent *e, Game *game)
 {
     static int savex = 0;
     static int savey = 0;
-    static int n = 0;
+   
 
     if (e->type == ButtonRelease) {
 	return;
@@ -292,7 +278,7 @@ void movement(Game *game)
 	Shape *s;
 	for(int j=0; j<5; j++){
 	s = &game->box[j];
-	if (p->s.center.y < s->center.y + s->height && 
+	if ((p->s.center.y < s->center.y + s->height && p->s.center.y>s->center.y - s->height )&&
 		p->s.center.x >= s->center.x - s->width &&
 		p->s.center.x <= s->center.x + s->width) {
 	    p->s.center.y = s->center.y + s->height; 
@@ -341,8 +327,8 @@ void render(Game *game)
 	glPushMatrix();
 	glColor3ub(0,84+rand()%(199-84),199);
 	Vec *c = &game->particle[i].s.center;
-	w = 2;
-	h = 2;
+	w = 2.2;
+	h = 2.2;
 	glBegin(GL_QUADS);
 	glVertex2i(c->x-w, c->y-h);
 	glVertex2i(c->x-w, c->y+h);
