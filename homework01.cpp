@@ -39,7 +39,7 @@
 #define WINDOW_HEIGHT 600
 #define rnd() (float)rand() / (float)RAND_MAX
 
-#define MAX_PARTICLES 100000
+#define MAX_PARTICLES 99999
 #define GRAVITY 0.1
 
 //X Windows variables
@@ -65,7 +65,7 @@ struct Particle {
 };
 
 struct Game {
-    Shape box;
+    Shape box[5];
     Particle particle[MAX_PARTICLES];
     int n;
     int bubbler;
@@ -94,12 +94,33 @@ int main(void)
     game.n=0;
 
     //declare a box shape
-    game.box.width = 100;
-    game.box.height = 10;
-    game.box.center.x = 120 + 5*65;
-    game.box.center.y = 500 - 5*60;
+    
+    	game.box[0].width = 80;
+    	game.box[0].height = 12;
+    	game.box[0].center.x = 100;
+    	game.box[0].center.y = 500;
+    
+    	game.box[1].width = 80;
+    	game.box[1].height = 12;
+    	game.box[1].center.x = 200;
+    	game.box[1].center.y = 450;
 
-    //start animation
+    	game.box[2].width = 80;
+    	game.box[2].height = 12;
+    	game.box[2].center.x = 300;
+    	game.box[2].center.y = 400;
+    	
+	game.box[3].width = 80;
+    	game.box[3].height = 12;
+    	game.box[3].center.x = 400;
+    	game.box[3].center.y = 350;
+    	
+	game.box[4].width = 80;
+    	game.box[4].height = 12;
+    	game.box[4].center.x = 500;
+    	game.box[4].center.y = 300;
+   
+       	//start animation
     while (!done) {
 	while (XPending(dpy)) {
 	    XEvent e;
@@ -181,7 +202,7 @@ void makeParticle(Game *game, int x, int y)
     p->s.center.x = x;
     p->s.center.y = y;
     p->velocity.y = rnd() * 0.5 - 0.25;
-    p->velocity.x =  rnd() * 0.5 - 0.25;
+    p->velocity.x =  rnd() * 0.2 - 0.25;
     game->n++;
 }
 
@@ -254,8 +275,10 @@ void movement(Game *game)
 
     if(game->bubbler !=0)
     {
+	for(int i=0; i<100; i++){
 	// the bubbler is on 
 	makeParticle(game,game->mouse[0], game->mouse[1]); 
+	}
     }
     for(int i=0; i<game->n;i++){
 	p = &game->particle[i];
@@ -267,13 +290,15 @@ void movement(Game *game)
 
 	//check for collision with shapes...
 	Shape *s;
-	s = &game->box;
+	for(int j=0; j<5; j++){
+	s = &game->box[j];
 	if (p->s.center.y < s->center.y + s->height && 
 		p->s.center.x >= s->center.x - s->width &&
 		p->s.center.x <= s->center.x + s->width) {
 	    p->s.center.y = s->center.y + s->height; 
-	    p->velocity.y = -p->velocity.y * 0.8f;
-	    p->velocity.x +=0.05f; 	
+	    p->velocity.y = -p->velocity.y * 0.3f;
+	    p->velocity.x +=0.02f; 	
+	}
 	}
 
 
@@ -283,6 +308,7 @@ void movement(Game *game)
 	    std::cout << "off screen" << std::endl;
 	 game->particle[i] = game->particle[--game->n]; 
 	}
+      
     }
 }
 
@@ -295,7 +321,8 @@ void render(Game *game)
     //draw boiiix
     Shape *s;
     glColor3ub(90,140,90);
-    s = &game->box;
+    for(int i=0; i<5; i++){
+    s = &game->box[i];
     glPushMatrix();
     glTranslatef(s->center.x, s->center.y, s->center.z);
     w = s->width;
@@ -307,11 +334,12 @@ void render(Game *game)
     glVertex2i( w,-h);
     glEnd();
     glPopMatrix();
+    }
 
     //draw all particles here
     for(int i=0; i<game->n; i++){
 	glPushMatrix();
-	glColor3ub(150,160,220);
+	glColor3ub(0,84+rand()%(199-84),199);
 	Vec *c = &game->particle[i].s.center;
 	w = 2;
 	h = 2;
