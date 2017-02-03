@@ -34,7 +34,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
-
+#include "fonts.h"
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 #define rnd() (float)rand() / (float)RAND_MAX
@@ -176,6 +176,9 @@ void init_opengl(void)
     glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1, 1);
     //Set the screen background color
     glClearColor(0.1, 0.1, 0.1, 1.0);
+    //Initialized Fonts
+    glEnable(GL_TEXTURE_2D);
+    initialize_fonts();
 }
 
 void makeParticle(Game *game, int x, int y)
@@ -301,14 +304,61 @@ void movement(Game *game)
 void render(Game *game)
 {
     float w, h;
+    Rect r; 
     glClear(GL_COLOR_BUFFER_BIT);
+    char names[5][32] = {"Requirements","Design","Coding","Testing","Maintenance"};
     //Draw shapes...
 
+    //Drawing Background
+    glPushMatrix(); 
+    glBegin(GL_QUADS);
+   
+    glColor3ub(0,24,72);
+    glVertex2i(0,WINDOW_HEIGHT);
+    glVertex2i(WINDOW_WIDTH,WINDOW_HEIGHT);
+    
+    glColor3ub(72,48,120);
+    glVertex2i(WINDOW_WIDTH,0);
+    glVertex2i(0,0);
+    glEnd(); 
+    glPopMatrix(); 
+
+    //DRAWING STARS 
+    for(int i=0; i<20; i++){
+
+	glPushMatrix();
+	glColor3ub(254,235+rand()%(255-235),215);
+	//Vec *c = &game->particle[i].s.center;
+	//w = 1.8;
+	h = 5;
+	glBegin(GL_QUADS);
+	glVertex2i(((int)WINDOW_WIDTH/5)*i,(int)WINDOW_HEIGHT/4);
+	glVertex2i(((int)WINDOW_WIDTH/5+h)*i,(int)WINDOW_HEIGHT/4);
+	glVertex2i(((int)WINDOW_WIDTH/5+h)*i,(int)WINDOW_HEIGHT/4+h);
+	glVertex2i(((int)WINDOW_WIDTH/5)*i,(int)WINDOW_HEIGHT/4+h);
+	glEnd();
+	glPopMatrix();
+
+
+
+
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //draw boiiix
     Shape *s;
-    glColor3ub(90,140,90);
     for(int i=0; i<5; i++){
     s = &game->box[i];
+    glColor3ub(90,140,90);
     glPushMatrix();
     glTranslatef(s->center.x, s->center.y, s->center.z);
     w = s->width;
@@ -320,6 +370,11 @@ void render(Game *game)
     glVertex2i( w,-h);
     glEnd();
     glPopMatrix();
+    
+    r.bot=s->center.y-10;  
+    r.left=s->center.x; 
+    r.center=s->center.y;
+    ggprint13(&r,20,0,"%s", names[i]);
     }
 
     //draw all particles here
