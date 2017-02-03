@@ -41,6 +41,7 @@
 
 #define MAX_PARTICLES 99999
 #define GRAVITY 0.1
+#define MAX_STAR 20
 
 //X Windows variables
 Display *dpy;
@@ -66,11 +67,19 @@ struct Particle {
 
 struct Game {
     Shape box[5];
+    Shape moon;
     Particle particle[MAX_PARTICLES];
     int n;
     int bubbler;
     int mouse[2];  
-    Game() { n=0;bubbler=0; }
+    float starP[MAX_STAR];
+	 
+    Game() { n=0;bubbler=0; 
+	for(int i=0; i<MAX_STAR; i++)
+	{
+	    starP[i]=rnd(); 
+	}
+    }
 };
 
 //Function prototypes
@@ -94,17 +103,18 @@ int main(void)
     game.n=0;
 
     //declare a box shape	
-		
-		
-    
     for(int j=0; j<5; j++)
     {
 		
 		game.box[j].width = 80;
     	game.box[j].height = 12;
-    	game.box[j].center.x = 100+(j*100);
-    	game.box[j].center.y = 500-(j*50);	
+    	game.box[j].center.x = 100+(j*125);
+    	game.box[j].center.y = 500-(j*75);	
 	}
+    //declare moon
+    game.moon.radius = 225; 
+    game.moon.center.x = WINDOW_WIDTH; 
+    game.moon.center.y = WINDOW_HEIGHT; 
     
        	//start animation
     while (!done) {
@@ -185,7 +195,7 @@ void makeParticle(Game *game, int x, int y)
 {
     if (game->n >= MAX_PARTICLES)
 	return;
-    std::cout << "makeParticle() " << x << " " << y << std::endl;
+    //std::cout << "makeParticle() " << x << " " << y << std::endl;
     //position of particle
     Particle *p = &game->particle[game->n];
     p->s.center.x = x;
@@ -294,7 +304,7 @@ void movement(Game *game)
 
 	//check for off-screen
 	if (p->s.center.y < 0.0) {
-	    std::cout << "off screen" << std::endl;
+	//    std::cout << "off screen" << std::endl;
 	 game->particle[i] = game->particle[--game->n]; 
 	}
       
@@ -324,37 +334,56 @@ void render(Game *game)
     glPopMatrix(); 
 
     //DRAWING STARS 
-    for(int i=0; i<20; i++){
+    int vertical=0; 
+    int horizontal=0; 
+    int sideL=5;
+    for(int i=0; i<5; i++){
+	for(int j=0; j<4; j++){
+	    vertical=((int)WINDOW_HEIGHT/5)*(i+game->starP[(i+1)*(j+1)]); 
+	    horizontal=((int)WINDOW_WIDTH/4)*(j+game->starP[(i+1)*(j+1)]);
+	
 
 	glPushMatrix();
-	glColor3ub(254,235+rand()%(255-235),215);
-	//Vec *c = &game->particle[i].s.center;
-	//w = 1.8;
-	h = 5;
+	glColor3ub(254,0+rand()%(255-0),215);
 	glBegin(GL_QUADS);
-	glVertex2i(((int)WINDOW_WIDTH/5)*i,(int)WINDOW_HEIGHT/4);
-	glVertex2i(((int)WINDOW_WIDTH/5+h)*i,(int)WINDOW_HEIGHT/4);
-	glVertex2i(((int)WINDOW_WIDTH/5+h)*i,(int)WINDOW_HEIGHT/4+h);
-	glVertex2i(((int)WINDOW_WIDTH/5)*i,(int)WINDOW_HEIGHT/4+h);
+	
+	glVertex2i(horizontal,vertical);
+	glVertex2i(horizontal+sideL,vertical);
+	glVertex2i(horizontal+sideL,vertical+sideL);
+	glVertex2i(horizontal,vertical+sideL);
+	
+	}	
+
+
+	glEnd();
+	glPopMatrix();
+	
+    }
+    // DRAW THE MOON
+    Shape *m; 
+    m=&game->moon; 
+    float x,y,radius; 
+    x = m->center.x; 
+    y = m->center.y;
+    radius = m->radius;
+    glPushMatrix();
+    glColor3ub(225,225,214);
+    int triangleAmount = 100; 
+    float twicePi = 2.0f * M_PI; 
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(x, y); // center of circle
+    for(int i = 0; i <= triangleAmount;i++) { 
+	glVertex2f(
+		x + (radius * cos(i *  twicePi / triangleAmount)), 
+		y + (radius * sin(i * twicePi / triangleAmount))
+		);
+    }
 	glEnd();
 	glPopMatrix();
 
-
-
-
-    }
-
-
     
     
-    
-    
-    
-    
-    
-    
-    
-    //draw boiiix
+    //draw box
     Shape *s;
     for(int i=0; i<5; i++){
     s = &game->box[i];
