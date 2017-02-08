@@ -4,7 +4,7 @@
 all: homework01
 
 homework01: homework01.cpp
-	g++ homework01.cpp fonts.h libggfonts.a -Wall -o homework01 -lX11 -lGL -lGLU -lm
+	g++ hw1.cpp fonts.h libggfonts.a -Wall -o hw1 -lX11 -lGL -lGLU -lm
 	
 
 clean:
